@@ -96,7 +96,7 @@ GameObject:
   - component: {fileID: 2487255387809440295}
   m_Layer: 0
   m_Name: Passage
-  m_TagString: Untagged
+  m_TagString: Passage
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
