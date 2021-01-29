@@ -7,13 +7,18 @@ public class PlayerController : MonoBehaviour
     public float moveSpeed;
     private Rigidbody2D rb;
 
-    // Start is called before the first frame update
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
     }
 
-    // Update is called once per frame
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        var script = collision.gameObject.GetComponent<PassageScript>();
+        if (!script) return;
+        script.Teleport(transform);
+    }
+
     void FixedUpdate()
     {
         var control = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
