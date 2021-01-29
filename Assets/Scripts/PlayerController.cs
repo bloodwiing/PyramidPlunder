@@ -14,7 +14,7 @@ public class PlayerController : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
+    void FixedUpdate()
     {
         var control = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
         rb.MovePosition(transform.position * Vector2.one + control * moveSpeed * Time.deltaTime);
