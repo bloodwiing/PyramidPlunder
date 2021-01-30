@@ -6,26 +6,38 @@ using System.Linq;
 public class ModuleObject : MonoBehaviour
 {
     private string passageTag = "Passage";
-    private List<PassageScript>[] passages = new List<PassageScript>[4];
+    [HideInInspector]
+    public List<PassageScript>[] passages = new List<PassageScript>[4];
+    [HideInInspector]
+    public int totalPassages;
+    [HideInInspector]
+    public PassageScript lastPassage;
 
-    void Start()
+    public void SolvePassages()
     {
         for (int x = 0; x < 4; x++)
             passages[x] = new List<PassageScript>();
 
-        var children = transform.Cast<Transform>().Where(child => child.gameObject.tag == passageTag).ToArray();
+        var children = transform.Cast<Transform>().Where(child => child.gameObject.CompareTag(passageTag)).ToArray();
         foreach (var child in children)
+        {
             passages[Mathf.RoundToInt(child.eulerAngles.z / 90)].Add(child.GetComponent<PassageScript>());
-
-        /*
-        for (int x = 0; x < 4; x++)
-            for (int y = 0; y < passages[x].Count; y++)
-                Debug.Log("X: " + x + " | Y: " + y + " | P: " + passages[x][y].ToString());
-        */
+            lastPassage = child.GetComponent<PassageScript>();
+        }
+        totalPassages = children.Length;
     }
 
-    void Update()
+    public void Reload(ModuleObject data)
     {
-        
-    }
+        passages = data.passages;
+        totalPassages = data.totalPassages;
+        lastPassage = data.lastPassage;
+    }    
+
+    //void Start()
+    //{
+    //    for (int x = 0; x < 4; x++)
+    //        for (int y = 0; y < passages[x].Count; y++)
+    //            Debug.Log("X: " + x + " | Y: " + y + " | P: " + passages[x][y].ToString());
+    //}
 }
