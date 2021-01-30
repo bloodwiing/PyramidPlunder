@@ -57,16 +57,8 @@ public class ModuleLoader : MonoBehaviour
         int moduleIndex = map.Count;
         map.Add(module);
 
-        //if (map.Count > 1)
-        //{
-        //    var dead = map[0].GetComponent<ModuleObject>();
-        //    var daeod = map[1].GetComponent<ModuleObject>();
-        //}
-
         module.SetActive(false);
         var moduleScript = module.GetComponent<ModuleObject>();
-
-        Debug.Log(ReferenceEquals(moduleScript.passages[0], possibleModules[moduleID].GetComponent<ModuleObject>().passages[0]));
 
         if (depth > maxDepth)
         {
@@ -110,11 +102,6 @@ public class ModuleLoader : MonoBehaviour
                     int modIndex = map.Count;
                     int index = Random.Range(0, possibilities.Length);
                     var mod = MapBranch(System.Array.IndexOf(possibleModules, possibilities[index]), depth + 1, InvertPassage(r));
-
-                    //var asd = map[0].GetComponent<ModuleObject>().passages[0];
-                    //map[0].GetComponent<ModuleObject>().passages[0].RemoveAt(0);
-                    //var sda = map[1].GetComponent<ModuleObject>().passages[0];
-                    //Debug.Log(ReferenceEquals(map[1].GetComponent<ModuleObject>().passages[0], map[0].GetComponent<ModuleObject>().passages[0]));
 
                     var passe = mod.GetComponent<ModuleObject>().passages[InvertPassage(r)].Where(p => !p.connected).ToArray()[0];
                     int passID = mod.GetComponent<ModuleObject>().passages[InvertPassage(r)].IndexOf(passe);

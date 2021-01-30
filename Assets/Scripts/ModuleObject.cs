@@ -58,12 +58,5 @@ public class ModuleObject : MonoBehaviour
             lastPassage = null;
         }
         return this;
-    }    
-
-    void Start()
-    {
-        for (int x = 0; x < 4; x++)
-            for (int y = 0; y < passages[x].Count; y++)
-                Debug.Log("X: " + x + " | Y: " + y + " | P: " + passages[x][y].ToString());
     }
 }

@@ -4,10 +4,10 @@ using UnityEngine;
 
 public class PassageScript : MonoBehaviour
 {
-    public GameObject other = null;  // Debug
-    public GameObject self = null;  // Debug
-    public int otherIndex;  // Debug
-    public int selfIndex;  // Debug
+    private GameObject other = null;
+    private GameObject self = null;
+    private int otherIndex;
+    private int selfIndex;
     [HideInInspector]
     public bool connected = false;
     public PassageScript otherSide = null;
@@ -25,27 +25,12 @@ public class PassageScript : MonoBehaviour
 
         connected = true;
         otherSide.connected = true;
-        //otherSide.other = self;
-        //otherSide.self = other;
-        //otherSide.otherSide = this;
-
-        //connected = true;
-        //otherSide.connected = true;
-        //o.other = o;
-        //o.otherSide = this;
-        //connected = true;
-        //o.connected = true;
     }
 
     public void Link(List<GameObject> map)
     {
         other = map[otherIndex];
         self = map[selfIndex];
-
-        //o.other = o;
-        //o.otherSide = this;
-        //connected = true;
-        //o.connected = true;
     }
 
     public void Reload()
