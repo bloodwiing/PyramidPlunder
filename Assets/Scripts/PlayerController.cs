@@ -21,7 +21,7 @@ public class PlayerController : MonoBehaviour
 
     void FixedUpdate()
     {
-        var control = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
+        var control = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical")).normalized;
         rb.MovePosition(transform.position * Vector2.one + control * moveSpeed * Time.deltaTime);
     }
 }
