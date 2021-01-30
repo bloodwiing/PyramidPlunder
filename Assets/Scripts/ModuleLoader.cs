@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 
+[ExecuteInEditMode]
 public class ModuleLoader : MonoBehaviour
 {
     [Header("Map generation")]
 
-    [Tooltip("A \"button\" that generates a new seed.")]
+    [Tooltip("Generates a new seed on play (DOESN'T SAVE WHEN STOPPED).")]
     public bool randomSeed;
     [Tooltip("A number, specifying how Random should randomize.")]
     public int seed;
@@ -15,6 +16,11 @@ public class ModuleLoader : MonoBehaviour
     [Tooltip("The limit of how far the generator can traverse\n(max amount of Passages before hitting a dead end from the spawn).")]
     [Range(1, 20)]
     public int maxDepth;
+    private int prevMaxDepth;
+
+    [Tooltip("The minimum amount of modules.")]
+    [Min(2)]
+    public int minModules;
 
     [Header("Other options")]
     [Tooltip("A list of all modules, which can be used for map generation.\nPlease don't forget to add modules here.\nTIP: To add multiple modules, lock the Inspector.")]
@@ -24,6 +30,7 @@ public class ModuleLoader : MonoBehaviour
 
     void Start()
     {
+        prevMaxDepth = maxDepth;
         if (randomSeed) seed = Random.Range(int.MinValue, int.MaxValue);
         if (!Application.isPlaying) return;
 
@@ -49,7 +56,7 @@ public class ModuleLoader : MonoBehaviour
         return number >= 2 ? number - 2 : number + 2;
     }
 
-    GameObject MapBranch(int moduleID, int depth, int skipR = -1)
+    GameObject MapBranch(int moduleID, int depth,  int skipR = -1)
     {
         var module = Instantiate(possibleModules[moduleID], transform);
         module.GetComponent<ModuleObject>().Reload().ClonePassages();
@@ -112,5 +119,15 @@ public class ModuleLoader : MonoBehaviour
         }
 
         return module;
+    }
+
+    private void OnValidate()
+    {
+        if (minModules > 5 + (maxDepth - 1) * 12)
+            if (maxDepth != prevMaxDepth)
+                minModules = 5 + (maxDepth - 1) * 12;
+            else
+                maxDepth = Mathf.CeilToInt((minModules - 5) / 12.0f) + 1;
+        prevMaxDepth = maxDepth;
     }
 }

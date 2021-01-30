@@ -496,7 +496,7 @@ Camera:
   m_Enabled: 1
   serializedVersion: 2
   m_ClearFlags: 2
-  m_BackGroundColor: {r: 0.19215687, g: 0.3019608, b: 0.4745098, a: 0}
+  m_BackGroundColor: {r: 0.13207549, g: 0.11276256, b: 0.11276256, a: 0}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0
@@ -1769,8 +1769,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   randomSeed: 1
-  seed: 146541
-  maxDepth: 5
+  seed: 1638977540
+  maxDepth: 8
+  minModules: 7
   possibleModules:
   - {fileID: 67323319073072143, guid: 117105a388a95c340a287c4d00053a0a, type: 3}
   - {fileID: 67323319073072143, guid: a3cf0119cb9c9c444b7693501cff8e57, type: 3}
