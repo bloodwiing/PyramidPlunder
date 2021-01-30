@@ -36,7 +36,7 @@ public class ModuleLoader : MonoBehaviour
             possibleModules[i].AddComponent<ModuleObject>().SolvePassages();
         }
 
-        int startingIndex = Random.Range(0, possibleModules.Length - 1);
+        int startingIndex = Random.Range(0, possibleModules.Length);
         MapBranch(startingIndex, 1).SetActive(true);
 
         foreach (var module in map)
@@ -108,7 +108,7 @@ public class ModuleLoader : MonoBehaviour
                         ).ToArray();
 
                     int modIndex = map.Count;
-                    int index = Random.Range(0, possibilities.Length - 1);
+                    int index = Random.Range(0, possibilities.Length);
                     var mod = MapBranch(System.Array.IndexOf(possibleModules, possibilities[index]), depth + 1, InvertPassage(r));
 
                     //var asd = map[0].GetComponent<ModuleObject>().passages[0];

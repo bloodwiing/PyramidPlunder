@@ -49,7 +49,7 @@ public class ModuleObject : MonoBehaviour
             passages = Array.ConvertAll(data.passages, e => new List<PassageScript>(e));
             totalPassages = data.totalPassages;
             var choices = passages.SelectMany(x => x).ToArray();
-            lastPassage = choices[UnityEngine.Random.Range(0, choices.Length - 1)];
+            lastPassage = choices[UnityEngine.Random.Range(0, choices.Length)];
         }
         else
         {
