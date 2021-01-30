@@ -1771,7 +1771,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   randomSeed: 0
   seed: 146541
-  maxDepth: 1
+  maxDepth: 2
   possibleModules:
   - {fileID: 67323319073072143, guid: fc0118f56371200449bbea94cbcd6c91, type: 3}
   - {fileID: 67323319073072143, guid: d133a9cf45fca1c439fcc06e669251f7, type: 3}

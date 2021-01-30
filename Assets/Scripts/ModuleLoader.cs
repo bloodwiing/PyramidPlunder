@@ -24,13 +24,16 @@ public class ModuleLoader : MonoBehaviour
 
     void Start()
     {
+        if (randomSeed) seed = Random.Range(int.MinValue, int.MaxValue);
         if (!Application.isPlaying) return;
 
         Random.InitState(seed);
 
         for (int i = 0; i < possibleModules.Length; i++)
         {
-            possibleModules[i].GetComponent<ModuleObject>().SolvePassages();
+            possibleModules[i] = Instantiate(possibleModules[i]);
+            possibleModules[i].SetActive(false);
+            possibleModules[i].AddComponent<ModuleObject>().SolvePassages();
         }
 
         int startingIndex = Random.Range(0, possibleModules.Length - 1);
@@ -49,14 +52,21 @@ public class ModuleLoader : MonoBehaviour
     GameObject MapBranch(int moduleID, int depth, int skipR = -1)
     {
         var module = Instantiate(possibleModules[moduleID], transform);
+        module.GetComponent<ModuleObject>().Reload().ClonePassages();
 
         int moduleIndex = map.Count;
         map.Add(module);
 
+        //if (map.Count > 1)
+        //{
+        //    var dead = map[0].GetComponent<ModuleObject>();
+        //    var daeod = map[1].GetComponent<ModuleObject>();
+        //}
+
         module.SetActive(false);
         var moduleScript = module.GetComponent<ModuleObject>();
 
-        moduleScript.Reload(possibleModules[moduleID].GetComponent<ModuleObject>());
+        Debug.Log(ReferenceEquals(moduleScript.passages[0], possibleModules[moduleID].GetComponent<ModuleObject>().passages[0]));
 
         if (depth > maxDepth)
         {
@@ -69,7 +79,9 @@ public class ModuleLoader : MonoBehaviour
         // For some reason combining these two loops makes Unity completely freeze.
 
         for (int r = 0; r < 4; r++)
-            foreach (var passage in moduleScript.passages[r])
+        {
+            var passages = new List<PassageScript>(moduleScript.passages[r]);
+            foreach (var passage in passages)
             {
                 passage.Reload();
                 if (r == skipR)
@@ -99,12 +111,18 @@ public class ModuleLoader : MonoBehaviour
                     int index = Random.Range(0, possibilities.Length - 1);
                     var mod = MapBranch(System.Array.IndexOf(possibleModules, possibilities[index]), depth + 1, InvertPassage(r));
 
+                    //var asd = map[0].GetComponent<ModuleObject>().passages[0];
+                    //map[0].GetComponent<ModuleObject>().passages[0].RemoveAt(0);
+                    //var sda = map[1].GetComponent<ModuleObject>().passages[0];
+                    //Debug.Log(ReferenceEquals(map[1].GetComponent<ModuleObject>().passages[0], map[0].GetComponent<ModuleObject>().passages[0]));
+
                     var passe = mod.GetComponent<ModuleObject>().passages[InvertPassage(r)].Where(p => !p.connected).ToArray()[0];
                     int passID = mod.GetComponent<ModuleObject>().passages[InvertPassage(r)].IndexOf(passe);
 
                     passage.Prepare(moduleIndex, modIndex, map[modIndex].GetComponent<ModuleObject>().passages[InvertPassage(r)][passID]);
                 }
             }
+        }
 
         return module;
     }

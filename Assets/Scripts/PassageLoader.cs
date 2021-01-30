@@ -4,7 +4,7 @@ using UnityEngine;
 using System.Linq;
 using System;
 
-public class ModuleObject : MonoBehaviour
+public class PassageLoader : MonoBehaviour
 {
     private string passageTag = "Passage";
     public List<PassageScript>[] passages = new List<PassageScript>[4];
@@ -42,7 +42,7 @@ public class ModuleObject : MonoBehaviour
         totalPassages = prevChildren.Length;
     }
 
-    public ModuleObject Reload(ModuleObject data = null)
+    public PassageLoader Reload(ModuleObject data = null)
     {
         if (data)
         {
@@ -58,7 +58,7 @@ public class ModuleObject : MonoBehaviour
             lastPassage = null;
         }
         return this;
-    }    
+    }
 
     void Start()
     {
