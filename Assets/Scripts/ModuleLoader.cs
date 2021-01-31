@@ -101,7 +101,7 @@ public class ModuleLoader : MonoBehaviour
                         ).ToArray();
 
                     int modIndex = map.Count;
-                    var mod = MapBranch(System.Array.IndexOf(possibleModules, possibilities[0]), depth + 1, --reqMod, InvertPassage(r));
+                    var mod = MapBranch(System.Array.IndexOf(possibleModules, possibilities[0]), depth + 1, 0, InvertPassage(r));
 
                     passage.Prepare(moduleIndex, modIndex, map[modIndex].GetComponent<ModuleObject>().lastPassage);
                 }
@@ -114,7 +114,7 @@ public class ModuleLoader : MonoBehaviour
                         margin = reqMod;
 
                     int rng = 0;
-                    if (margin > 1 || passages.Count - 1 > i)
+                    if (margin > 1 && passages.Count - 1 > i)
                         rng = Random.Range(-margin / 4, margin / 4);
                     int split = reqMod / (passages.Count - i) + rng;
                     reqMod -= split;
@@ -123,12 +123,13 @@ public class ModuleLoader : MonoBehaviour
 
                     GameObject[] possibilities = possibleModules.Where(
                         m => m.GetComponent<ModuleObject>().passages[InvertPassage(r)].Count > 0
-                        && (m.GetComponent<ModuleObject>().totalPassages >= split - (maxDepth - depth - 1) * 9)
+                        && m.GetComponent<ModuleObject>().totalPassages >= split - (maxDepth - depth - 1) * 9
+                        && ((split > 1 && m.GetComponent<ModuleObject>().totalPassages > 1) || split <= 1)  // This is the magic  SEED: -163430234
                         ).ToArray();
 
                     int modIndex = map.Count;
                     int index = Random.Range(0, possibilities.Length);
-                    var mod = MapBranch(System.Array.IndexOf(possibleModules, possibilities[index]), depth + 1, --reqMod, InvertPassage(r));
+                    var mod = MapBranch(System.Array.IndexOf(possibleModules, possibilities[index]), depth + 1, --split, InvertPassage(r));
 
                     var passe = mod.GetComponent<ModuleObject>().passages[InvertPassage(r)].Where(p => !p.connected).ToArray()[0];
                     int passID = mod.GetComponent<ModuleObject>().passages[InvertPassage(r)].IndexOf(passe);
