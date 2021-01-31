@@ -23,6 +23,12 @@ public class ModuleLoader : MonoBehaviour
     public int minModules;
 
     [Header("Other options")]
+    [Tooltip("Player object, used to enable and disable controls.")]
+    public GameObject player;
+    [Tooltip("Panel GUI, used to control animations.")]
+    public GameObject panel;
+    [Tooltip("Loading text, used to control animations.")]
+    public GameObject loading;
     [Tooltip("A list of all modules, which can be used for map generation.\nPlease don't forget to add modules here.\nTIP: To add multiple modules, lock the Inspector.")]
     public GameObject[] possibleModules;
 
@@ -30,6 +36,9 @@ public class ModuleLoader : MonoBehaviour
 
     void Start()
     {
+        loading.GetComponent<Animation>().Play();
+        player.GetComponent<PlayerController>().isFrozen = true;
+
         prevMaxDepth = maxDepth;
         if (randomSeed) seed = Random.Range(int.MinValue, int.MaxValue);
         if (!Application.isPlaying) return;
@@ -44,11 +53,16 @@ public class ModuleLoader : MonoBehaviour
         }
 
         int startingIndex = Random.Range(0, possibleModules.Length);
-        MapBranch(startingIndex, 1, minModules-1).SetActive(true);
+        StartCoroutine(MapBranch(startingIndex, 1, minModules - 1, gameObject => {
+            gameObject.SetActive(true);
 
-        foreach (var module in map)
-            foreach (var passage in module.transform.Cast<Transform>().Where(c => c.CompareTag("Passage")))
-                passage.GetComponent<PassageScript>().Link(map);
+            foreach (var module in map)
+                foreach (var passage in module.transform.Cast<Transform>().Where(c => c.CompareTag("Passage")))
+                    passage.GetComponent<PassageScript>().Link(map);
+
+            panel.GetComponent<Animation>().Play();
+            player.GetComponent<PlayerController>().isFrozen = false;
+        }));
     }
 
     int InvertPassage(int number)
@@ -56,8 +70,10 @@ public class ModuleLoader : MonoBehaviour
         return number >= 2 ? number - 2 : number + 2;
     }
 
-    GameObject MapBranch(int moduleID, int depth, int reqMod, int skipR = -1)
+    IEnumerator MapBranch(int moduleID, int depth, int reqMod, System.Action<GameObject> callback, int skipR = -1)
     {
+        yield return new WaitForSeconds(.05f);
+
         var module = Instantiate(possibleModules[moduleID], transform);
         module.GetComponent<ModuleObject>().Reload().ClonePassages();
 
@@ -76,7 +92,8 @@ public class ModuleLoader : MonoBehaviour
             for (int r = 0; r < 4; r++)
                 foreach (var passage in moduleScript.passages[r])
                     passage.Reload();
-            return module;
+            callback(module);
+            yield return null;
         }
 
         // For some reason combining these two loops makes Unity completely freeze.
@@ -101,9 +118,10 @@ public class ModuleLoader : MonoBehaviour
                         ).ToArray();
 
                     int modIndex = map.Count;
-                    var mod = MapBranch(System.Array.IndexOf(possibleModules, possibilities[0]), depth + 1, 0, InvertPassage(r));
-
-                    passage.Prepare(moduleIndex, modIndex, map[modIndex].GetComponent<ModuleObject>().lastPassage);
+                    yield return MapBranch(System.Array.IndexOf(possibleModules, possibilities[0]), depth + 1, 0, 
+                        gameObject => {
+                            passage.Prepare(moduleIndex, modIndex, map[modIndex].GetComponent<ModuleObject>().lastPassage);
+                        }, InvertPassage(r));
                 }
                 else
                 {
@@ -129,17 +147,20 @@ public class ModuleLoader : MonoBehaviour
 
                     int modIndex = map.Count;
                     int index = Random.Range(0, possibilities.Length);
-                    var mod = MapBranch(System.Array.IndexOf(possibleModules, possibilities[index]), depth + 1, --split, InvertPassage(r));
+                    yield return MapBranch(System.Array.IndexOf(possibleModules, possibilities[index]), depth + 1, --split, 
+                        gameObject => {
+                            var passe = gameObject.GetComponent<ModuleObject>().passages[InvertPassage(r)].Where(p => !p.connected).ToArray()[0];
+                            int passID = gameObject.GetComponent<ModuleObject>().passages[InvertPassage(r)].IndexOf(passe);
 
-                    var passe = mod.GetComponent<ModuleObject>().passages[InvertPassage(r)].Where(p => !p.connected).ToArray()[0];
-                    int passID = mod.GetComponent<ModuleObject>().passages[InvertPassage(r)].IndexOf(passe);
+                            passage.Prepare(moduleIndex, modIndex, map[modIndex].GetComponent<ModuleObject>().passages[InvertPassage(r)][passID]);
+                        }, InvertPassage(r));
 
-                    passage.Prepare(moduleIndex, modIndex, map[modIndex].GetComponent<ModuleObject>().passages[InvertPassage(r)][passID]);
                 }
             }
         }
 
-        return module;
+        callback(module);
+        yield return null;
     }
 
     private void OnValidate()
