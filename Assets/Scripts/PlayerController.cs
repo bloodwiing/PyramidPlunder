@@ -9,6 +9,8 @@ public class PlayerController : MonoBehaviour
 
     public bool isFrozen;
 
+    private bool prevState;
+
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
@@ -20,12 +22,21 @@ public class PlayerController : MonoBehaviour
         var script = collision.gameObject.GetComponent<PassageScript>();
         if (!script) return;
         script.Teleport(transform);
+        FindObjectOfType<AudioManager>().Play("Passage");
     }
 
     void FixedUpdate()
     {
         if (isFrozen) return;
         var control = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical")).normalized;
+
+        bool curState = Vector2.Distance(control, Vector2.zero) > 0;
+        if (curState && !prevState)
+            FindObjectOfType<AudioManager>().Play("Walk");
+        if (!curState && prevState)
+            FindObjectOfType<AudioManager>().Stop("Walk");
+        prevState = curState;
+
         rb.MovePosition(transform.position * Vector2.one + control * moveSpeed * Time.deltaTime);
     }
 }
