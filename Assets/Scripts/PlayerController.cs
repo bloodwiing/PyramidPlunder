@@ -25,6 +25,14 @@ public class PlayerController : MonoBehaviour
         FindObjectOfType<AudioManager>().Play("Passage");
     }
 
+    public void UpdateFreeze(bool newState)
+    {
+        FindObjectOfType<AudioManager>().Stop("Walk");
+        if (!newState && prevState)
+            FindObjectOfType<AudioManager>().Play("Walk");
+        isFrozen = newState;
+    }
+
     void FixedUpdate()
     {
         if (isFrozen) return;
