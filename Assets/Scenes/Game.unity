@@ -614,7 +614,7 @@ AudioSource:
   m_Enabled: 1
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
-  m_audioClip: {fileID: 8300000, guid: fd7b9a1c2c2c130489bd4df3d45e1093, type: 3}
+  m_audioClip: {fileID: 8300000, guid: fdea9ec7fd333d543892c542f86539f5, type: 3}
   m_PlayOnAwake: 1
   m_Volume: 0.5
   m_Pitch: 1
@@ -718,9 +718,9 @@ MonoBehaviour:
     loop: 0
     pitch: 1
     source: {fileID: 0}
-    clip: {fileID: 8300000, guid: d37dcb0ace9a08c41bcbc180d9691641, type: 3}
+    clip: {fileID: 8300000, guid: 77426136315a5064a8beb2aab3c15cbd, type: 3}
   - ID: Walk
-    volume: 0.6
+    volume: 1
     loop: 1
     pitch: 1
     source: {fileID: 0}
@@ -953,7 +953,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   randomSeed: 1
-  seed: -163430234
+  seed: 927761634
   maxDepth: 7
   minModules: 10
   player: {fileID: 1136584751}
