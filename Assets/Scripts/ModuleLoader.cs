@@ -44,7 +44,7 @@ public class ModuleLoader : MonoBehaviour
         }
 
         int startingIndex = Random.Range(0, possibleModules.Length);
-        MapBranch(startingIndex, 1).SetActive(true);
+        MapBranch(startingIndex, 1, minModules-1).SetActive(true);
 
         foreach (var module in map)
             foreach (var passage in module.transform.Cast<Transform>().Where(c => c.CompareTag("Passage")))
@@ -56,7 +56,7 @@ public class ModuleLoader : MonoBehaviour
         return number >= 2 ? number - 2 : number + 2;
     }
 
-    GameObject MapBranch(int moduleID, int depth,  int skipR = -1)
+    GameObject MapBranch(int moduleID, int depth, int reqMod, int skipR = -1)
     {
         var module = Instantiate(possibleModules[moduleID], transform);
         module.GetComponent<ModuleObject>().Reload().ClonePassages();
@@ -66,6 +66,10 @@ public class ModuleLoader : MonoBehaviour
 
         module.SetActive(false);
         var moduleScript = module.GetComponent<ModuleObject>();
+
+        int maxPossible = 3 + (maxDepth - depth) * 9;
+        if (maxPossible < 0)
+            maxPossible = 1;
 
         if (depth > maxDepth)
         {
@@ -80,8 +84,9 @@ public class ModuleLoader : MonoBehaviour
         for (int r = 0; r < 4; r++)
         {
             var passages = new List<PassageScript>(moduleScript.passages[r]);
-            foreach (var passage in passages)
+            for (int i = 0; i < passages.Count; i++)
             {
+                var passage = passages[i];
                 passage.Reload();
                 if (r == skipR)
                 {
@@ -96,19 +101,34 @@ public class ModuleLoader : MonoBehaviour
                         ).ToArray();
 
                     int modIndex = map.Count;
-                    var mod = MapBranch(System.Array.IndexOf(possibleModules, possibilities[0]), depth + 1, InvertPassage(r));
+                    var mod = MapBranch(System.Array.IndexOf(possibleModules, possibilities[0]), depth + 1, --reqMod, InvertPassage(r));
 
                     passage.Prepare(moduleIndex, modIndex, map[modIndex].GetComponent<ModuleObject>().lastPassage);
                 }
                 else
                 {
+                    int margin = maxPossible - reqMod;
+                    if (margin < 0)
+                        margin = 0;
+                    if (margin > reqMod)
+                        margin = reqMod;
+
+                    int rng = 0;
+                    if (margin > 1 || passages.Count - 1 > i)
+                        rng = Random.Range(-margin / 4, margin / 4);
+                    int split = reqMod / (passages.Count - i) + rng;
+                    reqMod -= split;
+                    if (split < 0)
+                        split = 0;
+
                     GameObject[] possibilities = possibleModules.Where(
                         m => m.GetComponent<ModuleObject>().passages[InvertPassage(r)].Count > 0
+                        && (m.GetComponent<ModuleObject>().totalPassages >= split - (maxDepth - depth - 1) * 9)
                         ).ToArray();
 
                     int modIndex = map.Count;
                     int index = Random.Range(0, possibilities.Length);
-                    var mod = MapBranch(System.Array.IndexOf(possibleModules, possibilities[index]), depth + 1, InvertPassage(r));
+                    var mod = MapBranch(System.Array.IndexOf(possibleModules, possibilities[index]), depth + 1, --reqMod, InvertPassage(r));
 
                     var passe = mod.GetComponent<ModuleObject>().passages[InvertPassage(r)].Where(p => !p.connected).ToArray()[0];
                     int passID = mod.GetComponent<ModuleObject>().passages[InvertPassage(r)].IndexOf(passe);
@@ -123,11 +143,11 @@ public class ModuleLoader : MonoBehaviour
 
     private void OnValidate()
     {
-        if (minModules > 5 + (maxDepth - 1) * 12)
+        if (minModules > 3 + (maxDepth - 1) * 9)
             if (maxDepth != prevMaxDepth)
-                minModules = 5 + (maxDepth - 1) * 12;
+                minModules = 3 + (maxDepth - 1) * 9;
             else
-                maxDepth = Mathf.CeilToInt((minModules - 5) / 12.0f) + 1;
+                maxDepth = Mathf.CeilToInt((minModules - 3) / 9.0f) + 1;
         prevMaxDepth = maxDepth;
     }
 }
